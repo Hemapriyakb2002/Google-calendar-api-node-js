@@ -1,7 +1,6 @@
 import { google } from 'googleapis';
 import dotenv from 'dotenv';
 dotenv.config();
-import {v4 as uuid} from 'uuid';
 
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 
@@ -9,7 +8,7 @@ const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 const authClient = new google.auth.OAuth2(
   process.env.CLIENT_ID,
   process.env.CLIENT_SECRET,
-  process.env.REDIRECT_URL // Add the redirect URI if applicable
+  process.env.REDIRECT_URL 
 );
 
 // Get the authorization URL for the OAuth2 flow
@@ -31,8 +30,7 @@ export const auth2 = async (req,res) => {
 
 // Callback function to create the event
 export const createEvent = async (req, res) => {
-  // const { start, end } = req.body;
-  
+  const { start, end, email } = req.body;
   try {
     // Create a new instance of the Google Calendar API
     const calendar = google.calendar({ version: 'v3', auth: authClient });
@@ -42,20 +40,15 @@ export const createEvent = async (req, res) => {
       summary: 'My Event',
       description:'Poc event',
       start: {
-        dateTime:  "2023-07-07T09:00:00-07:00",
+        dateTime:  start,
         timeZone: "Asia/Kolkata"
       },
       end: {
-        dateTime:  "2023-07-07T10:00:00-07:00",
+        dateTime:  end,
         timeZone: "Asia/Kolkata"
       },
-      conferenceData:{
-        createRequest:{
-          requestId:uuid(),
-        }
-      },
       attendees:[ {
-        email:"demopoc14@gmail.com"
+        email:  email
       }]
     };
 
@@ -63,7 +56,7 @@ export const createEvent = async (req, res) => {
     const response = await calendar.events.insert({
       calendarId: 'primary',
       resource: event,
-      conferenceDataVersion:1
+      sendNotifications: true 
     });
 
     res.status(200).json({
