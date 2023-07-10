@@ -7,6 +7,6 @@ const router = express.Router();
 
 router.get('/google',authUrl)
 router.get('/google/redirect',auth2)
-router.get('/google/calendar', createEvent);
+router.post('/google/calendar', createEvent);
 
 export default router;
